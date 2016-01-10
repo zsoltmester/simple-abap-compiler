@@ -1,0 +1,35 @@
+* Osszegzes
+        PROGRAM
+    osszeg
+.
+* Osszegzes ?*!
+DATA            :
+* Osszegzes
+i TYPE I    ,s     TYPE I,
+* Osszegzes
+
+        more TYPE B     .
+
+* Osszegzes
+  MOVE    0    TO     s    .
+* Osszegzes
+  READ    TO     more    .
+WHILE
+more
+.
+    READ TO i.
+* Osszegzes
+    IF i>10 AND i<100   .
+* Osszegzes
+      ADD
+      i
+      TO
+      s
+      .
+    ENDIF   .
+* Osszegzes
+READ TO more          .
+ENDWHILE        .
+* Osszegzes
+WRITE s.
+* Osszegzes

@@ -1,0 +1,14 @@
+PROGRAM utasitasok.
+DATA:
+a TYPE I, b TYPE B.
+READ TO a.
+ADD 1 TO a.
+SUBTRACT 2 FROM a.
+MULTIPLY a BY a.
+DIVIDE a BY 2.
+READ TO b.
+IF a OR NOT b.
+    WRITE a.
+ELSE.
+    WRITE b.
+ENDIF.

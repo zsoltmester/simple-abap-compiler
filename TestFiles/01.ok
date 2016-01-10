@@ -1,0 +1,16 @@
+* Osszegzes
+PROGRAM osszeg.
+DATA:
+  i     TYPE I,
+  s     TYPE I,
+  more  TYPE B.
+MOVE 0 TO s.
+READ TO more.
+WHILE more.
+    READ TO i.
+    IF i > 10 AND i < 100.
+      ADD i TO s.
+    ENDIF.
+    READ TO more.
+ENDWHILE.
+WRITE s.
