@@ -1,15 +1,12 @@
 %option noyywrap c++ yylineno
 
 %{
-	#include <iostream>
 	#include <cstdlib>
+	#include <iostream>
 	#include <sstream>
+	#include "Parserbase.h"
 
 	#define DEBUG true
-
-	void print_token(std::string token) {
-		std::cout << token << std::endl;
-	}
 
 	void print_debug_message(std::string message) {
 		if(DEBUG) {
@@ -87,152 +84,190 @@ MOD_KEYWORD MOD
 }
 
 {END_STATEMENT_CHARACTER}$ {
-	print_token("END_STATEMENT");
+	print_debug_message("Lexer read: END_STATEMENT"); 
+	return Parser::END_STATEMENT;
 }
 
 {PROGRAM_KEYWORD} {
-	print_token("PROGRAM");
+	print_debug_message("Lexer read: PROGRAM"); 
+	return Parser::PROGRAM;
 }
 
 {DATA_KEYWORD} {
-	print_token("DATA");
+	print_debug_message("Lexer read: DATA"); 
+	return Parser::DATA;
 }
 
 {DATA_SUFIX} {
-	print_token("DATA_SUFIX");
+	print_debug_message("Lexer read: DATA_SUFIX"); 
+	return Parser::DATA_SUFIX;
 }
 
 {DATA_SEPARATOR} {
-	print_token("DATA_SEPARATOR");
+	print_debug_message("Lexer read: DATA_SEPARATOR"); 
+	return Parser::DATA_SEPARATOR;
 }
 
 {TYPE_KEYWORD} {
-	print_token("TYPE");
+	print_debug_message("Lexer read: TYPE"); 
+	return Parser::TYPE;
 }
 
 {TYPE_KEYWORD_I} {
-	print_token("TYPE_I");
+	print_debug_message("Lexer read: TYPE_I"); 
+	return Parser::TYPE_I;
 }
 
 {TYPE_KEYWORD_B} {
-	print_token("TYPE_B");
+	print_debug_message("Lexer read: TYPE_B"); 
+	return Parser::TYPE_B;
 }
 
 {WHILE_KEYWORD} {
-	print_token("WHILE");
+	print_debug_message("Lexer read: WHILE"); 
+	return Parser::WHILE;
 }
 
 {ENDWHILE_KEYWORD} {
-	print_token("ENDWHILE");
+	print_debug_message("Lexer read: ENDWHILE"); 
+	return Parser::ENDWHILE;
 }
 
 {IF_KEYWORD} {
-	print_token("IF");
+	print_debug_message("Lexer read: IF"); 
+	return Parser::IF;
 }
 
 {ELSE_KEYWORD} {
-	print_token("ELSE");
+	print_debug_message("Lexer read: ELSE"); 
+	return Parser::ELSE;
 }
 
 {ENDIF_KEYWORD} {
-	print_token("ENDIF");
+	print_debug_message("Lexer read: ENDIF"); 
+	return Parser::ENDIF;
 }
 
 {EQUAL_KEYWORD} {
-	print_token("EQUAL");
+	print_debug_message("Lexer read: EQUAL"); 
+	return Parser::EQUAL;
 }
 
 {LESSER_THAN_KEYWORD} {
-	print_token("LESSER_THAN");
+	print_debug_message("Lexer read: LESSER_THAN"); 
+	return Parser::LESSER_THAN;
 }
 
 {GREATER_THAN_KEYWORD} {
-	print_token("GREATER_THAN");
+	print_debug_message("Lexer read: GREATER_THAN"); 
+	return Parser::GREATER_THAN;
 }
 
 {AND_KEYWORD} {
-	print_token("AND");
+	print_debug_message("Lexer read: AND"); 
+	return Parser::AND;
 }
 
 {OR_KEYWORD} {
-	print_token("OR");
+	print_debug_message("Lexer read: OR"); 
+	return Parser::OR;
 }
 
 {NOT_KEYWORD} {
-	print_token("NOT");
+	print_debug_message("Lexer read: NOT"); 
+	return Parser::NOT;
 }
 
 {TO_KEYWORD} {
-	print_token("TO");
+	print_debug_message("Lexer read: TO"); 
+	return Parser::TO;
 }
 
 {BY_KEYWORD} {
-	print_token("BY");
+	print_debug_message("Lexer read: BY"); 
+	return Parser::BY;
 }
 
 {FROM_KEYWORD} {
-	print_token("FROM");
+	print_debug_message("Lexer read: FROM"); 
+	return Parser::FROM;
 }
 
 {READ_KEYWORD} {
-	print_token("READ");
+	print_debug_message("Lexer read: READ"); 
+	return Parser::READ;
 }
 
 {WRITE_KEYWORD} {
-	print_token("WRITE");
+	print_debug_message("Lexer read: WRITE"); 
+	return Parser::WRITE;
 }
 
 {MOVE_KEYWORD} {
-	print_token("MOVE");
+	print_debug_message("Lexer read: MOVE"); 
+	return Parser::MOVE;
 }
 
 {ADD_KEYWORD} {
-	print_token("ADD");
+	print_debug_message("Lexer read: ADD"); 
+	return Parser::ADD;
 }
 
 {SUBTRACT_KEYWORD} {
-	print_token("SUBTRACT");
+	print_debug_message("Lexer read: SUBTRACT"); 
+	return Parser::SUBTRACT;
 }
 
 {MULTIPLY_KEYWORD} {
-	print_token("MULTIPLY");
+	print_debug_message("Lexer read: MULTIPLY"); 
+	return Parser::MULTIPLY;
 }
 
 {DIVIDE_KEYWORD} {
-	print_token("DIVIDE");
+	print_debug_message("Lexer read: DIVIDE"); 
+	return Parser::DIVIDE;
 }
 
 {MOD_KEYWORD} {
-	print_token("MOD");
+	print_debug_message("Lexer read: MOD"); 
+	return Parser::MOD;
 }
 
 {TYPE_I_IDENTIFIER} {
-	print_token("IDENTIFIER_I");
+	std::string current_text = YYText();
+	print_debug_message("Lexer read: IDENTIFIER_I: " + current_text); 
+	return Parser::IDENTIFIER_I;
 }
 
 {TYPE_KEYWORD_B_TRUE} {
-	print_token("IDENTIFIER_B_TRUE");
+	print_debug_message("Lexer read: IDENTIFIER_B_TRUE"); 
+	return Parser::IDENTIFIER_B_TRUE;
 }
 
 {TYPE_KEYWORD_B_FALSE} {
-	print_token("IDENTIFIER_B_FALSE");
+	print_debug_message("Lexer read: IDENTIFIER_B_FALSE"); 
+	return Parser::IDENTIFIER_B_FALSE;
 }
 
 {LEFT_BRACKET} {
-	print_token("LEFT_BRACKET");
+	print_debug_message("Lexer read: LEFT_BRACKET"); 
+	return Parser::LEFT_BRACKET;
 }
 
 {RIGHT_BRACKET} {
-	print_token("RIGHT_BRACKET");
+	print_debug_message("Lexer read: RIGHT_BRACKET"); 
+	return Parser::RIGHT_BRACKET;
 }
 
 {IDENTIFIER} {
-	print_token("IDENTIFIER");
+	std::string current_text = YYText();
+	print_debug_message("Lexer read: IDENTIFIER: " + current_text); 
+	return Parser::IDENTIFIER;
 }
 
 {WHITEPACE}+ {
 	// Skip whitespaces
-	print_debug_message("Whitespace skipped.");
+	//print_debug_message("Whitespace skipped.");
 }
 
 . {

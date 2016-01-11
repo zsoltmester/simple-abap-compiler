@@ -1,8 +1,9 @@
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <FlexLexer.h>
-#include <cstdlib>
+#include "Parser.h"
 
 #define DEBUG true
 
@@ -12,10 +13,10 @@ int main( int argc, char* argv[] )
 {
     std::ifstream ifs;
     handle_input(ifs, argc, argv);
-    yyFlexLexer fl(&ifs, &std::cout);
-    fl.yylex();
+    Parser parser(ifs);
+    parser.parse();
     if (DEBUG) {
-        std::cout << "[DEBUG] Lexical analyzer finished successfuly." << std::endl;
+        std::cout << "[DEBUG] Compiler finished successfuly." << std::endl;
     }
     return 0;
 }
