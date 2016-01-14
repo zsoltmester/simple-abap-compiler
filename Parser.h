@@ -18,12 +18,13 @@ class Parser: public ParserBase
 
     private:
         yyFlexLexer lexer;
+        std::map<std::string, VariableData> symbolTable;
+        
         void error(char const *msg);    // called on (syntax) errors
-        int lex();                      // returns the next token from the
-                                        // lexical scanner. 
-        void print();                   // use, e.g., d_token, d_loc
+        int lex();                      // returns the next token from the lexical scanner. 
+        void print();					//use, e.g., d_token, d_loc
 
-    // support functions for parse():
+    	// support functions for parse():
         void executeAction(int ruleNr);
         void errorRecovery();
         int lookup(bool recovery);

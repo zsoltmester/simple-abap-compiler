@@ -9,13 +9,14 @@
 
 void handle_input(std::ifstream& ifs, int argc, char* argv[]);
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
     std::ifstream ifs;
     handle_input(ifs, argc, argv);
     Parser parser(ifs);
     parser.parse();
-    if (DEBUG) {
+    if (DEBUG) 
+    {
         std::cout << "[DEBUG] Compiler finished successfuly." << std::endl;
     }
     return 0;

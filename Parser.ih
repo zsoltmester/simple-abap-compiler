@@ -8,15 +8,23 @@
 
 inline void Parser::error(char const *msg)
 {
-    std::cerr << "[ERROR] Sxntax error: " << d_loc__.first_line << std::endl;
+    std::cerr << "[ERROR] " << msg << "\n" << "At line: " << d_loc__.first_line << std::endl;
     exit(1);
 }
 
 // $insert lex
 inline int Parser::lex()
 {
+	int token = lexer.yylex();
+	
     d_loc__.first_line = lexer.lineno();
-    return lexer.yylex();
+    
+    if(token == IDENTIFIER_I || token == IDENTIFIER_B_TRUE || token == IDENTIFIER_B_FALSE || token == IDENTIFIER)
+	{
+	  d_val__.value = new std::string(lexer.YYText());
+	}
+	
+    return token;
 }
 
 inline void Parser::print()         

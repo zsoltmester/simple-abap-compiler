@@ -1,7 +1,10 @@
-TODO makefile-t kell csinálnom
+Fordítás (a pandora.inf.elte.hu-n):
+	> Külön:
+	  flex lexical.l
+	  bisonc++ grammar.y
+	  g++ -o AbapSimple lex.yy.cc main.cc parse.cc
+	> Makefile-al:
+	  make
 
-Fordítás a pandora.inf.elte.hu szerveren:
-
-flex lexical.l
-bisonc++ grammar.y
-g++ -o compiler lex.yy.cc main.cc parse.cc
+Feltölteni egy filet:
+	> scp -r ./<a_file_neve> qt3qf8@pandora.inf.elte.hu:~/Compiler/AbapSimple 

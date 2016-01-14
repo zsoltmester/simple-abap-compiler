@@ -1,5 +1,11 @@
-%baseclass-preinclude <iostream>
+%baseclass-preinclude "semantics.h"
 %lsp-needed
+
+%union
+{
+	std::string *value;
+	Type *type;
+}
 
 %token 
 END_STATEMENT
@@ -27,19 +33,20 @@ SUBTRACT
 MULTIPLY
 DIVIDE
 MOD
-IDENTIFIER_I
-IDENTIFIER_B_TRUE
-IDENTIFIER_B_FALSE
 LEFT_BRACKET
 RIGHT_BRACKET
-IDENTIFIER
+%token <value> IDENTIFIER_I
+%token <value> IDENTIFIER_B_TRUE
+%token <value> IDENTIFIER_B_FALSE
+%token <value> IDENTIFIER
 
-%left
-AND
-OR
-EQUAL
-LESSER_THAN
-GREATER_THAN
+%type <type> expression;
+
+%left OR
+%left AND
+%left EQUAL
+%left LESSER_THAN
+%left GREATER_THAN
 
 %%
 
@@ -95,11 +102,37 @@ declaration:
 	IDENTIFIER TYPE TYPE_I
 	{
         std::cout << "data -> IDENTIFIER TYPE TYPE_I" << std::endl;
+        std::cout << "Declared: " << *$1 << std::endl;
+        
+		if (symbolTable.count(*$1) > 0)
+		{
+			std::stringstream ss;
+			ss << "Duplicated variable: \"" << *$1 << "\", "
+				<< "Previous declaration: " << symbolTable[*$1].declarationRow;
+			error(ss.str().c_str());
+		}
+		
+		symbolTable[*$1] = VariableData(d_loc__.first_line, Integer);
+		
+		delete $1;
 	}
 |
 	IDENTIFIER TYPE TYPE_B 
 	{
         std::cout << "data -> IDENTIFIER TYPE TYPE_B" << std::endl;
+        std::cout << "Declared: " << *$1 << std::endl;
+        
+		if (symbolTable.count(*$1) > 0)
+		{
+			std::stringstream ss;
+			ss << "Duplicated variable: \"" << *$1 << "\", "
+				<< "Previous declaration: " << symbolTable[*$1].declarationRow;
+			error(ss.str().c_str());
+		}
+		
+		symbolTable[*$1] = VariableData(d_loc__.first_line, Boolean);
+		
+		delete $1;
 	}
 ;
 
@@ -186,56 +219,137 @@ expression:
 	IDENTIFIER
 	{
         std::cout << "expression -> IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$1) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$1;
+			error(ss.str().c_str());
+		}
+		
+		$$ = new Type(symbolTable[*$1].type);
+
+		delete $1;
 	}
 |
 	IDENTIFIER_I
 	{
         std::cout << "expression -> IDENTIFIER_I" << std::endl;
+        
+		$$ = new Type(Integer);
 	}
 |
 	IDENTIFIER_B_TRUE
 	{
         std::cout << "expression -> IDENTIFIER_B_TRUE" << std::endl;
+        
+		$$ = new Type(Boolean);
 	}
 |
 	IDENTIFIER_B_FALSE
 	{
         std::cout << "expression -> IDENTIFIER_B_FALSE" << std::endl;
+        
+		$$ = new Type(Boolean);
 	}
 |
 	expression AND expression
 	{
         std::cout << "expression -> expression AND expression" << std::endl;
+        
+        if (*$1 != Boolean || *$3 != Boolean)
+        {
+        	std::cout << *$1 << " - " << *$3 << std::endl;
+        	error("Invalid types at AND.");
+        }
+        
+		delete $1;
+		delete $3;
+		
+		$$ = new Type(Boolean);
 	}
 |
 	expression OR expression
 	{
         std::cout << "expression -> expression OR expression" << std::endl;
+        
+        if (*$1 != Boolean || *$3 != Boolean)
+        {
+        	error("Invalid types at OR.");
+        }
+        
+		delete $1;
+		delete $3;
+		
+		$$ = new Type(Boolean);
 	}
 |
 	NOT expression
 	{
         std::cout << "expression -> NOT expression" << std::endl;
+        
+        if (*$2 != Boolean)
+        {
+        	error("Invalid type at NOT.");
+        }
+        
+		delete $2;
+		
+		$$ = new Type(Boolean);
 	}
 |
 	LEFT_BRACKET expression RIGHT_BRACKET
 	{
         std::cout << "expression -> LEFT_BRACKET expression RIGHT_BRACKET" << std::endl;
+        
+		$$ = $2;
+		
+		delete $2;
 	}
 |
 	expression EQUAL expression
 	{
         std::cout << "expression -> expression EQUAL expression" << std::endl;
+        
+        if (*$1 != Integer || *$3 != Integer)
+        {
+        	error("Invalid types at EQUAL.");
+        }
+        
+		delete $1;
+		delete $3;
+		
+		$$ = new Type(Boolean);
 	}
 |
 	expression LESSER_THAN expression
 	{
         std::cout << "expression -> expression LESSER_THAN expression" << std::endl;
+        
+        if (*$1 != Integer || *$3 != Integer)
+        {
+        	error("Invalid types at LESSER_THAN.");
+        }
+        
+		delete $1;
+		delete $3;
+		
+		$$ = new Type(Boolean);
 	}
 |
 	expression GREATER_THAN expression
 	{
         std::cout << "expression -> expression GREATER_THAN expression" << std::endl;
+        
+        if (*$1 != Integer || *$3 != Integer)
+        {
+        	error("Invalid types at GREATER_THAN.");
+        }
+        
+		delete $1;
+		delete $3;
+		
+		$$ = new Type(Boolean);
 	}
 ;
 
@@ -243,6 +357,21 @@ move:
 	MOVE expression TO IDENTIFIER
 	{
         std::cout << "move -> MOVE expression TO IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$4) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$4;
+			error(ss.str().c_str());
+		}
+		
+		if (*$2 != symbolTable[*$4].type)
+        {
+        	error("Invalid types at MOVE.");
+        }
+
+		delete $2;
+		delete $4;
 	}
 ;
 
@@ -250,6 +379,15 @@ read:
 	READ TO IDENTIFIER
 	{
         std::cout << "read -> READ TO IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$3) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$3;
+			error(ss.str().c_str());
+		}
+
+		delete $3;
 	}
 ;
 
@@ -264,6 +402,21 @@ add:
 	ADD expression TO IDENTIFIER
 	{
         std::cout << "add -> ADD expression TO IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$4) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$4;
+			error(ss.str().c_str());
+		}
+        
+        if (*$2 != Integer || symbolTable[*$4].type != Integer)
+        {
+        	error("Invalid types at ADD.");
+        }
+
+		delete $2;
+		delete $4;
 	}
 ;
 
@@ -271,6 +424,21 @@ substract:
 	SUBTRACT expression FROM IDENTIFIER
 	{
         std::cout << "substract -> SUBTRACT expression FROM IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$4) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$4;
+			error(ss.str().c_str());
+		}
+        
+        if (*$2 != Integer || symbolTable[*$4].type != Integer)
+        {
+        	error("Invalid types at SUBTRACT.");
+        }
+
+		delete $2;
+		delete $4;
 	}
 ;
 
@@ -278,6 +446,21 @@ multiply:
 	MULTIPLY IDENTIFIER BY expression
 	{
         std::cout << "multiply -> MULTIPLY IDENTIFIER BY expression" << std::endl;
+        
+		if(symbolTable.count(*$2) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$2;
+			error(ss.str().c_str());
+		}
+        
+        if (*$4 != Integer || symbolTable[*$2].type != Integer)
+        {
+        	error("Invalid types at MULTIPLY.");
+        }
+
+		delete $2;
+		delete $4;
 	}
 ;
 
@@ -285,6 +468,21 @@ divide:
 	DIVIDE IDENTIFIER BY expression
 	{
         std::cout << "divide -> DIVIDE IDENTIFIER BY expression" << std::endl;
+        
+		if(symbolTable.count(*$2) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$2;
+			error(ss.str().c_str());
+		}
+        
+        if (*$4 != Integer || symbolTable[*$2].type != Integer)
+        {
+        	error("Invalid types at DIVIDE.");
+        }
+
+		delete $4;
+		delete $2;
 	}
 ;
 
@@ -292,6 +490,29 @@ mod:
 	MOD IDENTIFIER BY expression TO IDENTIFIER
 	{
         std::cout << "mod -> MOD IDENTIFIER BY expression TO IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$2) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$2;
+			error(ss.str().c_str());
+		}
+        
+		if(symbolTable.count(*$6) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$6;
+			error(ss.str().c_str());
+		}
+        
+        if (*$4 != Integer || symbolTable[*$2].type != Integer || symbolTable[*$6].type != Integer)
+        {
+        	error("Invalid types at MOD.");
+        }
+
+		delete $2;
+		delete $4;
+		delete $6;
 	}
 ;
 
@@ -299,6 +520,13 @@ while:
 	WHILE expression END_STATEMENT one_or_more_statements ENDWHILE
 	{
         std::cout << "while -> WHILE expression END_STATEMENT one_or_more_statements ENDWHILE" << std::endl;
+        
+        if (*$2 != Boolean)
+        {
+        	error("Invalid type at WHILE.");
+        }
+
+		delete $2;
 	}
 ;
 
@@ -306,6 +534,13 @@ if:
 	IF expression END_STATEMENT one_or_more_statements zero_or_one_else
 	{
         std::cout << "if -> IF expression END_STATEMENT one_or_more_statements zero_or_one_else" << std::endl;
+        
+        if (*$2 != Boolean)
+        {
+        	error("Invalid type at IF.");
+        }
+
+		delete $2;
 	}
 ;
 
