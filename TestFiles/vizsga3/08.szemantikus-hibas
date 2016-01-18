@@ -1,0 +1,5 @@
+PROGRAM pelda.
+DATA:
+    x TYPE I.
+CONCAT x TO x.
+WRITE length(x).

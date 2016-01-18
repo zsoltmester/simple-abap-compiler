@@ -16,6 +16,7 @@ DATA_SEPARATOR
 TYPE
 TYPE_I
 TYPE_B
+TYPE_S
 WHILE
 ENDWHILE
 IF
@@ -33,6 +34,9 @@ SUBTRACT
 MULTIPLY
 DIVIDE
 MOD
+CONCAT
+LENGTH
+STRING_LITERAL
 LEFT_BRACKET
 RIGHT_BRACKET
 %token <value> IDENTIFIER_I
@@ -134,6 +138,24 @@ declaration:
 		
 		delete $1;
 	}
+|
+	IDENTIFIER TYPE TYPE_S 
+	{
+        std::cout << "data -> IDENTIFIER TYPE TYPE_S" << std::endl;
+        std::cout << "Declared: " << *$1 << std::endl;
+        
+		if (symbolTable.count(*$1) > 0)
+		{
+			std::stringstream ss;
+			ss << "Duplicated variable: \"" << *$1 << "\", "
+				<< "Previous declaration: " << symbolTable[*$1].declarationRow;
+			error(ss.str().c_str());
+		}
+		
+		symbolTable[*$1] = VariableData(d_loc__.first_line, String);
+		
+		delete $1;
+	}
 ;
 
 //
@@ -204,6 +226,11 @@ statement:
         std::cout << "statement -> mod" << std::endl;
 	}
 |
+	concat
+	{
+        std::cout << "statement -> concat" << std::endl;
+	}
+|
 	while
 	{
         std::cout << "statement -> while" << std::endl;
@@ -251,6 +278,13 @@ expression:
         std::cout << "expression -> IDENTIFIER_B_FALSE" << std::endl;
         
 		$$ = new Type(Boolean);
+	}
+|
+	STRING_LITERAL
+	{
+        std::cout << "expression -> STRING_LITERAL" << std::endl;
+        
+		$$ = new Type(String);
 	}
 |
 	expression AND expression
@@ -350,6 +384,20 @@ expression:
 		delete $3;
 		
 		$$ = new Type(Boolean);
+	}
+|
+	LENGTH LEFT_BRACKET expression RIGHT_BRACKET
+	{
+        std::cout << "expression -> LENGTH LEFT_BRACKET expression RIGHT_BRACKET" << std::endl;
+		
+		if (*$3 != String)
+        {
+        	error("Invalid types at LENGTH.");
+        }
+        
+		delete $3;
+        
+		$$ = new Type(Integer);
 	}
 ;
 
@@ -513,6 +561,28 @@ mod:
 		delete $2;
 		delete $4;
 		delete $6;
+	}
+;
+
+concat:
+	CONCAT expression TO IDENTIFIER
+	{
+        std::cout << "concat -> CONCAT expression TO IDENTIFIER" << std::endl;
+        
+		if(symbolTable.count(*$4) == 0)
+		{
+			std::stringstream ss;
+			ss << " Undeclared variable: " << *$4;
+			error(ss.str().c_str());
+		}
+        
+        if (*$2 != String || symbolTable[*$4].type != String)
+        {
+        	error("Invalid types at CONCAT.");
+        }
+
+		delete $2;
+		delete $4;
 	}
 ;
 

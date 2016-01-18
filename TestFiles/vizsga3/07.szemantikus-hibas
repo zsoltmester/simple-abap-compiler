@@ -1,0 +1,6 @@
+PROGRAM pelda.
+DATA:
+    x TYPE I.
+CONCAT "SDFGHJ" TO x.
+CONCAT x TO x.
+WRITE length(x).

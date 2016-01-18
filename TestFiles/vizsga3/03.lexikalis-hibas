@@ -1,0 +1,7 @@
+PROGRAM pelda.
+DATA:
+    x TYPE S.
+MOVE "alma§+"!%/ <<>#&@{123" TO x.
+CONCAT "SDFGHJ" TO x.
+CONCAT x TO x.
+WRITE length(x).

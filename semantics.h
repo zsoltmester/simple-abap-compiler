@@ -9,7 +9,8 @@
 enum Type 
 {
 	Integer,
-	Boolean
+	Boolean,
+	String
 };
 
 struct VariableData

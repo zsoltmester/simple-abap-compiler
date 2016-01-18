@@ -40,6 +40,7 @@ TYPE_I_IDENTIFIER {DIGIT}+
 TYPE_KEYWORD_B B
 TYPE_KEYWORD_B_TRUE TRUE
 TYPE_KEYWORD_B_FALSE FALSE
+TYPE_KEYWORD_S S
 
 COMMENT ^{COMMENT_INDICATOR}.*
 
@@ -74,6 +75,11 @@ SUBTRACT_KEYWORD SUBTRACT
 MULTIPLY_KEYWORD MULTIPLY
 DIVIDE_KEYWORD DIVIDE
 MOD_KEYWORD MOD
+
+CONCAT_KEYWORD CONCAT
+LENGTH_KEYWORD length
+
+STRING_LITERAL \"[^\"\n]*\"
 
 %%
 
@@ -121,6 +127,11 @@ MOD_KEYWORD MOD
 {TYPE_KEYWORD_B} {
 	print_debug_message("Lexer read: TYPE_B"); 
 	return Parser::TYPE_B;
+}
+
+{TYPE_KEYWORD_S} {
+	print_debug_message("Lexer read: TYPE_S"); 
+	return Parser::TYPE_S;
 }
 
 {WHILE_KEYWORD} {
@@ -233,6 +244,16 @@ MOD_KEYWORD MOD
 	return Parser::MOD;
 }
 
+{CONCAT_KEYWORD} {
+	print_debug_message("Lexer read: CONCAT"); 
+	return Parser::CONCAT;
+}
+
+{LENGTH_KEYWORD} {
+	print_debug_message("Lexer read: LENGTH"); 
+	return Parser::LENGTH;
+}
+
 {TYPE_I_IDENTIFIER} {
 	std::string current_text = YYText();
 	print_debug_message("Lexer read: IDENTIFIER_I: " + current_text); 
@@ -263,6 +284,12 @@ MOD_KEYWORD MOD
 	std::string current_text = YYText();
 	print_debug_message("Lexer read: IDENTIFIER: " + current_text); 
 	return Parser::IDENTIFIER;
+}
+
+{STRING_LITERAL} {
+	std::string current_text = YYText();
+	print_debug_message("Lexer read: STRING_LITERAL: " + current_text); 
+	return Parser::STRING_LITERAL;
 }
 
 {WHITEPACE}+ {
