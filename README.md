@@ -1,4 +1,4 @@
-#A simple ABAP compiler, with a way less feature than to original.
+#A simple ABAP compiler, with a way less feature than the original.
 ##Compile:
 	- Step by step:
 	    flex lexical.l
