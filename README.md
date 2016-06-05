@@ -1,5 +1,6 @@
-#A simple ABAP compiler, with a way less feature than the original.
-##Compile:
+#ABAP compiler
+It has less feature, than the original.
+##Compile this project
 	- Step by step:
 	    flex lexical.l
 	    bisonc++ grammar.y
